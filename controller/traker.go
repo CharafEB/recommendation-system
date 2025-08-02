@@ -8,12 +8,24 @@ import (
 )
 
 func (trk *TrakerCron) MoviesCSV(ctx context.Context) {
-	//Create the temp Movies.csv file
-	trk.Cron.AddFunc("@every 24h", func() {
-		fmt.Print("MoviesCSV started...")
-		file, err := os.Create("/temp/Movies.csv")
+	// Schedule the cron job every 30 seconds
+	trk.Cron.AddFunc("@every 10s", func() {
+		fmt.Println("MoviesCSV started...")
+
+		// Ensure the directory exists
+		dirPath := "tempf"
+		err := os.MkdirAll(dirPath, os.ModePerm)
+		if err != nil {
+			trk.respondWithError("Failed to create directory for Movies.csv", err)
+			return
+		}
+
+		// Create the Movies.csv file
+		filePath := dirPath + "/Movies.csv"
+		file, err := os.Create(filePath)
 		if err != nil {
 			trk.respondWithError("Movies.csv not created", err)
+			return
 		}
 		defer file.Close()
 
@@ -21,8 +33,9 @@ func (trk *TrakerCron) MoviesCSV(ctx context.Context) {
 		defer writer.Flush()
 
 		if err := trk.Application.Storge.Traker.MoviesCSV(ctx, writer); err != nil {
-			trk.respondWithError("Error while writing on Movies.csv", err)
+			trk.respondWithError("Error while writing to Movies.csv", err)
 		}
+		fmt.Println("MoviesCSV done...")
 	})
-
 }
+

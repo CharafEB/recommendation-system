@@ -4,21 +4,25 @@ import (
 	"context"
 	"encoding/csv"
 	"fmt"
+	"strconv"
+	"strings"
 )
 
-func (db *Database) MoviesCSV(ctx context.Context , w *csv.Writer) (error){
-	rows, err := db.DB.Query("SELECT * FROM your_table")
+func (db *Database) MoviesCSV(ctx context.Context, w *csv.Writer) error {
+	rows, err := db.DB.Query("SELECT * FROM movies")
 	if err != nil {
-		return  err
+		return err
 	}
 	defer rows.Close()
 
 	columns, err := rows.Columns()
 	if err != nil {
-		return  err
+		return err
 	}
 
-	w.Write(columns)
+	if err := w.Write(columns); err != nil {
+		return err
+	}
 
 	values := make([]interface{}, len(columns))
 	valuePtrs := make([]interface{}, len(columns))
@@ -28,22 +32,46 @@ func (db *Database) MoviesCSV(ctx context.Context , w *csv.Writer) (error){
 			valuePtrs[i] = &values[i]
 		}
 
-		err := rows.Scan(valuePtrs...)
-		if err != nil {
-			return  err
+		if err := rows.Scan(valuePtrs...); err != nil {
+			return err
 		}
 
 		record := make([]string, len(columns))
 		for i, val := range values {
 			if val != nil {
-				record[i] = fmt.Sprintf("%v", val)
+				switch v := val.(type) {
+				case []uint8:
+					str := string(v)
+
+
+					if strings.HasPrefix(str, "{") && strings.HasSuffix(str, "}") {
+
+						clean := strings.Trim(str, "{}")
+						parts := strings.Split(clean, ",")
+						var floats []string
+						for _, p := range parts {
+							p = strings.TrimSpace(p)
+							if _, err := strconv.ParseFloat(p, 32); err == nil {
+								floats = append(floats, p)
+							}
+						}
+
+						record[i] = "[" + strings.Join(floats, ",") + "]"
+					} else {
+						record[i] = str
+					}
+				default:
+					record[i] = fmt.Sprintf("%v", val)
+				}
 			} else {
 				record[i] = ""
 			}
 		}
 
-		w.Write(record)
+		if err := w.Write(record); err != nil {
+			return err
+		}
 	}
 
-	return  nil
+	return nil
 }
