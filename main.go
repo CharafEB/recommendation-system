@@ -55,7 +55,7 @@ func main() {
 		Application: &app,
 	}
 	
-	Traker.MoviesCSV(ctx)
+	Traker.UsersRatingsCSV(ctx)
 	Traker.Cron.Start()
 
 	cntrolObj := &router.Control{

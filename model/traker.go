@@ -8,8 +8,9 @@ import (
 	"strings"
 )
 
-func (db *Database) MoviesCSV(ctx context.Context, w *csv.Writer) error {
-	rows, err := db.DB.Query("SELECT * FROM movies")
+func (db *Database) CSVTabls(ctx context.Context, w *csv.Writer , table string) error {
+	query := `SELECT * FROM ($1)`
+	rows, err := db.DB.Query(query , table)
 	if err != nil {
 		return err
 	}
@@ -42,7 +43,6 @@ func (db *Database) MoviesCSV(ctx context.Context, w *csv.Writer) error {
 				switch v := val.(type) {
 				case []uint8:
 					str := string(v)
-
 
 					if strings.HasPrefix(str, "{") && strings.HasSuffix(str, "}") {
 

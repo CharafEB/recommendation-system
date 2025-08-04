@@ -13,7 +13,7 @@ type Database struct {
 
 type Store struct {
 	Traker interface {
-		MoviesCSV(ctx context.Context , w *csv.Writer) (error)
+		CSVTabls(ctx context.Context, w *csv.Writer, table string) error
 	}
 }
 
@@ -24,7 +24,6 @@ func NewStore(db *sql.DB) Store {
 	Database := &Database{DB: db}
 
 	return Store{
-		Traker:        Database,
-
+		Traker: Database,
 	}
 }
