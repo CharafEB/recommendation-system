@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 )
-
+//UsersCSV: do crea an csv file that have the users 
 func (trk *TrakerCron) UsersCSV(ctx context.Context) {
 	// Schedule the cron job every 30 seconds
 	trk.Cron.AddFunc("@every 10s", func() {
@@ -21,7 +21,7 @@ func (trk *TrakerCron) UsersCSV(ctx context.Context) {
 		}
 
 		// Create the Movies.csv file
-		filePath := dirPath + "/UsersRating.csv"
+		filePath := dirPath + "/Users.csv"
 		file, err := os.Create(filePath)
 		if err != nil {
 			trk.respondWithError("UsersRating.csv not created", err)
@@ -32,9 +32,9 @@ func (trk *TrakerCron) UsersCSV(ctx context.Context) {
 		writer := csv.NewWriter(file)
 		defer writer.Flush()
 
-		if err := trk.Application.Storge.Traker.CSVTabls(ctx, writer, "client"); err != nil {
-			trk.respondWithError("Error while writing to Movies.csv", err)
+		if err := trk.Application.Storge.Traker.CSVTabls(ctx, writer, "users"); err != nil {
+			trk.respondWithError("Error while writing to Users.csv \n", err)
 		}
-		fmt.Println("UsersRatingsCSV done...")
+		fmt.Println("UsersCSV done...")
 	})
 }

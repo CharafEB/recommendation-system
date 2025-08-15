@@ -8,9 +8,20 @@ import (
 	"strings"
 )
 
-func (db *Database) CSVTabls(ctx context.Context, w *csv.Writer , table string) error {
-	query := `SELECT * FROM ($1)`
-	rows, err := db.DB.Query(query , table)
+func (db *Database) CSVTabls(ctx context.Context, w *csv.Writer, table string) error {
+	// list of the tabls that allowed 
+	allowedTables := map[string]bool{
+		"ratings": true,
+		"users":  true,
+	}
+
+	if !allowedTables[table] {
+		return fmt.Errorf("table not allowed: %s", table)
+	}
+
+	query := fmt.Sprintf(`SELECT * FROM %q;`, table)
+
+	rows, err := db.DB.QueryContext(ctx, query)
 	if err != nil {
 		return err
 	}

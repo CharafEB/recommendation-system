@@ -19,7 +19,7 @@ func (trk *TrakerCron) UsersRatingsCSV(ctx context.Context) {
 			trk.respondWithError("Failed to create directory for UsersRating.csv", err)
 			return
 		}
-
+		
 		// Create the Movies.csv file
 		filePath := dirPath + "/UsersRating.csv"
 		file, err := os.Create(filePath)
@@ -33,8 +33,7 @@ func (trk *TrakerCron) UsersRatingsCSV(ctx context.Context) {
 		defer writer.Flush()
 
 		if err := trk.Application.Storge.Traker.CSVTabls(ctx, writer, "ratings"); err != nil {
-			trk.respondWithError("Error while writing to Movies.csv", err)
+			trk.respondWithError("Error while writing to UsersRatingsCSV.csv", err)
 		}
-		fmt.Println("UsersRatingsCSV done...")
 	})
 }
