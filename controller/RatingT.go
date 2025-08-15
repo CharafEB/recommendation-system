@@ -8,8 +8,8 @@ import (
 )
 
 func (trk *TrakerCron) UsersRatingsCSV(ctx context.Context) {
-	// Schedule the cron job every 30 seconds
-	trk.Cron.AddFunc("@every 10s", func() {
+	// Schedule the cron job every 22 hours
+	trk.Cron.AddFunc("@every 22h", func() {
 		fmt.Println("UsersRatingsCSV started...")
 
 		// Ensure the directory exists
